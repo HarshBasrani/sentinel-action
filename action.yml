@@ -1,0 +1,22 @@
+name: "Sentinel - Ghost Import Killer"
+description: "Strict enforcement of dependency usage. Blocks unused production dependencies."
+author: "Sentinel"
+inputs:
+  ignore_packages:
+    description: "Comma-separated list of packages to ignore (e.g., polyfills, build plugins)"
+    required: false
+    default: ""
+  tsconfig_path:
+    description: "Path to tsconfig.json relative to root. Essential for monorepos."
+    required: false
+    default: "tsconfig.json"
+  source_globs:
+    description: "Glob patterns for source files to scan. Defaults to src directory."
+    required: false
+    default: "src/**/*.{ts,tsx,js,jsx}"
+runs:
+  using: "node20"
+  main: "dist/index.js"
+branding:
+  icon: "shield-lock"
+  color: "red"

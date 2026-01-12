@@ -1,0 +1,34 @@
+{
+  "name": "sentinel-ghost-killer",
+  "version": "0.1.0",
+  "description": "Strict enforcement of dependency usage in Pull Requests.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "bundle": "ncc build src/main.ts -o dist --source-map --license licenses.txt",
+    "test": "jest",
+    "package": "npm run build && npm run bundle",
+    "all": "npm run package && npm test"
+  },
+  "keywords": [
+    "actions",
+    "security",
+    "dependencies",
+    "ghost-imports",
+    "governance"
+  ],
+  "author": "Sentinel",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "ts-morph": "^21.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.5",
+    "@vercel/ncc": "^0.38.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  }
+}
