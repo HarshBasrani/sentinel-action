@@ -1,6 +1,6 @@
 {
   "name": "sentinel-ghost-killer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Strict enforcement of dependency usage in Pull Requests.",
   "main": "dist/index.js",
   "scripts": {

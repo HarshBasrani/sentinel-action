@@ -25,7 +25,11 @@ export async function checkGhostImports(
   }
   
   // 2. LOAD DEPS: Only scan "dependencies" (Production), ignore "devDependencies"
-  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+  // Read raw content
+  const raw = fs.readFileSync(packageJsonPath, 'utf-8');
+  // Strip BOM (Byte Order Mark) if present - fixes Windows/PowerShell issues
+  const cleanRaw = raw.replace(/^\uFEFF/, '');
+  const pkg = JSON.parse(cleanRaw);
   const dependencies = Object.keys(pkg.dependencies || {});
 
   if (dependencies.length === 0) {
