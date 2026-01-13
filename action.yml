@@ -2,6 +2,10 @@ name: "Sentinel - Ghost Import Killer"
 description: "Strict enforcement of dependency usage. Blocks unused production dependencies."
 author: "Sentinel"
 inputs:
+  github_token:
+    description: "The GitHub Token to post comments. Defaults to ${{ github.token }}"
+    required: false
+    default: "${{ github.token }}"
   ignore_packages:
     description: "Comma-separated list of packages to ignore (e.g., polyfills, build plugins)"
     required: false

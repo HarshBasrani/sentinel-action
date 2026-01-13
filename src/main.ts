@@ -1,35 +1,29 @@
 import * as core from '@actions/core';
 import { checkGhostImports } from './ghost-imports';
+import { postComment } from './reporter'; // Import the new reporter
 
 async function run() {
   try {
-    // 1. ENVIRONMENT SETUP
-    // GITHUB_WORKSPACE is where the code lives on the runner.
     const projectRoot = process.env.GITHUB_WORKSPACE || '.';
     
-    // 2. INPUT PARSING (Crucial for UX)
-    // Users often type "react, react-dom" with spaces. We must sanitize.
+    // Inputs
     const ignoreInput = core.getInput('ignore_packages');
     const ignoreList = ignoreInput 
       ? ignoreInput.split(',').map(s => s.trim()).filter(s => s.length > 0) 
       : [];
 
     const tsConfigPath = core.getInput('tsconfig_path') || 'tsconfig.json';
-    
     const sourceGlobsInput = core.getInput('source_globs');
     const sourceGlobs = sourceGlobsInput
       ? sourceGlobsInput.split(',').map(s => s.trim()).filter(s => s.length > 0)
-      : ['src/**/*.{ts,tsx,js,jsx}']; // Default fallback if empty
+      : ['src/**/*.{ts,tsx,js,jsx}'];
 
     core.info('🛡️ Sentinel: Initializing Ghost Scan...');
-    core.info(`   - Root: ${projectRoot}`);
-    core.info(`   - Ignore List: [${ignoreList.join(', ')}]`);
-    core.info(`   - TS Config: ${tsConfigPath}`);
 
-    // 3. EXECUTE LOGIC
+    // Execute Logic
     const result = await checkGhostImports(projectRoot, ignoreList, tsConfigPath, sourceGlobs);
 
-    // 4. REPORTING
+    // Reporting
     core.info('--------------------------------------------------');
     core.info(`📊 Scan Complete:`);
     core.info(`   - Scanned Files: ${result.scannedFiles}`);
@@ -37,29 +31,21 @@ async function run() {
     core.info(`   - Verified Usage: ${result.usedDeps}`);
     core.info('--------------------------------------------------');
 
-    // 5. THE VERDICT (Green or Red)
+    // VERDICT
     if (result.ghosts.length > 0) {
-      // This is the most important line. It breaks the build.
+      // 1. Post the Comment (NEW STEP)
+      await postComment(result.ghosts);
+
+      // 2. Fail the Build
       core.setFailed(`
         ❌ Sentinel found ${result.ghosts.length} Ghost Dependencies!
-        
-        These packages are defined in 'dependencies' but NOT imported in your source code.
-        This increases bloat and security risk.
-        
-        👻 Ghost Packages:
-        ${result.ghosts.map(g => `   - ${g}`).join('\n')}
-        
-        👉 ACTION REQUIRED:
-        1. Remove these packages from package.json if unused.
-        2. OR move them to 'devDependencies' if they are build tools.
-        3. OR add them to 'ignore_packages' in workflow if they are side-effects.
+        👻 Ghost Packages: ${result.ghosts.join(', ')}
       `);
     } else {
       core.info('✅ Sentinel Passed: Dependency graph is clean.');
     }
 
   } catch (error) {
-    // Defensive coding: If the tool crashes, fail the build so the user knows.
     if (error instanceof Error) core.setFailed(`Sentinel Internal Error: ${error.message}`);
   }
 }
