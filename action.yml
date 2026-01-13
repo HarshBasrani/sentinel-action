@@ -1,26 +1,26 @@
-name: "Sentinel - Ghost Import Killer"
-description: "Strict enforcement of dependency usage. Blocks unused production dependencies."
-author: "Sentinel"
+name: 'Sentinel - Ghost Import Killer'
+description: 'Strict enforcement of dependency usage. Blocks unused production dependencies.'
+author: 'Sentinel'
 inputs:
   github_token:
-    description: "The GitHub Token to post comments. Defaults to ${{ github.token }}"
+    description: 'The GitHub Token to post comments. Pass secrets.GITHUB_TOKEN.'
     required: false
-    default: "${{ github.token }}"
+    # REMOVED THE DEFAULT LINE TO FIX THE CRASH
   ignore_packages:
-    description: "Comma-separated list of packages to ignore (e.g., polyfills, build plugins)"
+    description: 'Comma-separated list of packages to ignore (e.g., polyfills, build plugins)'
     required: false
-    default: ""
+    default: ''
   tsconfig_path:
-    description: "Path to tsconfig.json relative to root. Essential for monorepos."
+    description: 'Path to tsconfig.json relative to root. Essential for monorepos.'
     required: false
-    default: "tsconfig.json"
+    default: 'tsconfig.json'
   source_globs:
-    description: "Glob patterns for source files to scan. Defaults to src directory."
+    description: 'Glob patterns for source files to scan. Defaults to src directory.'
     required: false
-    default: "src/**/*.{ts,tsx,js,jsx}"
+    default: 'src/**/*.{ts,tsx,js,jsx}'
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: 'node20'
+  main: 'dist/index.js'
 branding:
-  icon: "shield-lock"
-  color: "red"
+  icon: 'shield-lock'
+  color: 'red'
