@@ -50,7 +50,15 @@ async function run() {
       };
 
       try {
-        await axios.post(dashboardUrl, payload);
+        // --- FIX: Add Header to bypass Localtunnel warning page ---
+        const config = {
+          headers: {
+            'Bypass-Tunnel-Reminder': 'true',
+            'Content-Type': 'application/json'
+          }
+        };
+        
+        await axios.post(dashboardUrl, payload, config);
         core.info('✅ Report saved to Dashboard successfully.');
       } catch (error: any) {
         // Don't fail the build just because the dashboard is down
