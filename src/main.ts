@@ -1,4 +1,6 @@
 import * as core from '@actions/core';
+import * as github from '@actions/github';
+import axios from 'axios';
 import { checkGhostImports } from './ghost-imports';
 import { postComment } from './reporter'; // Import the new reporter
 
@@ -30,6 +32,37 @@ async function run() {
     core.info(`   - Production Deps: ${result.totalDeps}`);
     core.info(`   - Verified Usage: ${result.usedDeps}`);
     core.info('--------------------------------------------------');
+
+    // --- NEW: REPORTING LOGIC START ---
+    const dashboardUrl = core.getInput('dashboard_url');
+    const projectToken = core.getInput('project_token');
+
+    if (dashboardUrl && projectToken) {
+      core.info(`📡 Sending report to Sentinel Dashboard: ${dashboardUrl}`);
+
+      const payload = {
+        repo_token: projectToken,
+        // Calculate a simple score: 100 - (5 points per unused dep)
+        health_score: Math.max(0, 100 - (result.ghosts.length * 5)),
+        ghost_dependencies: result.ghosts,
+        commit_hash: github.context.sha,
+        branch: github.context.ref.replace('refs/heads/', ''),
+      };
+
+      try {
+        await axios.post(dashboardUrl, payload);
+        core.info('✅ Report saved to Dashboard successfully.');
+      } catch (error: any) {
+        // Don't fail the build just because the dashboard is down
+        core.warning(`⚠️ Failed to send report: ${error.message}`);
+        if (error.response) {
+          core.debug(JSON.stringify(error.response.data));
+        }
+      }
+    } else {
+      core.info('ℹ️ Dashboard reporting skipped (url or token missing).');
+    }
+    // --- NEW: REPORTING LOGIC END ---
 
     // VERDICT
     if (result.ghosts.length > 0) {

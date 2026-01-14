@@ -1,6 +1,6 @@
 {
   "name": "sentinel-ghost-killer",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "description": "Strict enforcement of dependency usage in Pull Requests.",
   "main": "dist/index.js",
   "scripts": {
@@ -22,6 +22,7 @@
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/github": "^7.0.0",
+    "axios": "^1.13.2",
     "ts-morph": "^21.0.1"
   },
   "devDependencies": {
